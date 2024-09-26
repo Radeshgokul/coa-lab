@@ -1,0 +1,126 @@
+1 (a) Write a program in assembly language to print single character on screen.
+ORG 100h           ; Origin, to specify that the program starts at 100h (COM file format)
+; Read a single character from user
+MOV AH, 01h        ; Function 01h of INT 21h is used to read a character from input
+INT 21h            ; Call DOS interrupt to get the character
+MOV DL, AL         ; Store the input character from AL register to DL for printing
+; Print the character on screen
+MOV AH, 02h        ; Function 02h of INT 21h is used to print a character
+INT 21h            ; Call DOS interrupt to print the character
+; Terminate the program
+MOV AH, 4Ch        ; Function 4Ch of INT 21h terminates the program
+INT 21h            ; Call DOS interrupt to exit
+END                ; End of program
+
+1.(b) Write an assembly language program to convert an upper-case letter to the corresponding lower-case letter.
+ORG 100h           ; Origin, to specify that the program starts at 100h (COM file format)
+; Display message "Enter an uppercase letter: "
+MOV DX, OFFSET msg_input  ; Load the address of the message
+MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+INT 21h            ; Call DOS interrupt to print the message
+; Read a single character from the user
+MOV AH, 01h        ; Function 01h of INT 21h is used to read a character
+INT 21h            ; Call DOS interrupt to get the character
+MOV AL, AL         ; Store the input character in AL
+; Check if the character is an uppercase letter (A-Z)
+CMP AL, 'A'        ; Compare AL with 'A'
+JL NotUpperCase    ; If the input is less than 'A', it is not uppercase
+CMP AL, 'Z'        ; Compare AL with 'Z'
+JG NotUpperCase    ; If the input is greater than 'Z', it is not uppercase
+; Convert the uppercase letter to lowercase
+ADD AL, 20h        ; Add 32 (20h) to convert uppercase to lowercase
+; Print the message "The lowercase letter is: "
+;MOV DX, OFFSET msg_output  ; Load the address of the output message
+;MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+;INT 21h            ; Call DOS interrupt to print the output message
+; Print the converted lowercase letter
+MOV DL, AL         ; Move the lowercase letter to DL
+MOV AH, 02h        ; Function 02h of INT 21h is used to print a single character
+INT 21h            ; Call DOS interrupt to print the character
+JMP EndProgram     ; Jump to the end of the program
+NotUpperCase:
+; If the input is not an uppercase letter, display an error message
+MOV DX, OFFSET msg_error  ; Load the address of the error message
+MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+INT 21h            ; Call DOS interrupt to print the error message
+EndProgram:
+; Terminate the program
+MOV AH, 4Ch        ; Function 4Ch of INT 21h terminates the program
+INT 21h            ; Call DOS interrupt to exit
+msg_input  DB 'Enter an uppercase letter: $'
+msg_output DB 0Dh, 0Ah, 'The lowercase letter is: $'  ; Output message
+msg_error  DB 0Dh, 0Ah, 'Error: Not an uppercase letter! $'  ; Error message
+END                ; End of program
+
+2. (a) Write a program in assembly language to print multiple characters on screen.
+ORG 100h           ; Origin, to specify that the program starts at 100h (COM file format)
+MOV SI, 0          ; Initialize SI register to use as an index for storing characters
+MOV CX, 0          ; Initialize CX to count the number of characters input
+INPUT_LOOP:
+  MOV AH, 01h      ; Function 01h of INT 21h to read a character from input
+  INT 21h          ; Call DOS interrupt to get the character
+  CMP AL, 0Dh      ; Check if the character is 'Enter' (ASCII code 0Dh)
+  JE DISPLAY       ; If yes, jump to DISPLAY to print the characters
+  MOV message[SI], AL ; Store the character in the message array
+  INC SI           ; Move to the next position in the array
+  INC CX           ; Increment the character count
+  JMP INPUT_LOOP   ; Repeat the loop to read the next character
+DISPLAY:
+  MOV SI, 0        ; Reset SI to start from the beginning of the message
+  MOV AH, 02h      ; Function 02h of INT 21h is used to print a character
+PRINT_LOOP:
+  MOV DL, message[SI] ; Move the character at SI into DL
+  CMP CX, 0        ; Check if all characters are printed
+  JE EXIT          ; If yes, jump to exit
+  INT 21h          ; Call DOS interrupt to print the character
+  INC SI           ; Move to the next character in the string
+  DEC CX           ; Decrease character count
+  JMP PRINT_LOOP   ; Repeat the loop
+
+EXIT:
+  MOV AH, 4Ch      ; Function 4Ch of INT 21h terminates the program
+  INT 21h          ; Call DOS interrupt to exit
+message DB 80 DUP(?) ; Reserve 80 bytes to store the user input characters
+END                ; End of program
+2. (b) Write an assembly language program to convert a lower-case letter to the
+corresponding upper-case letter.
+ORG 100h           ; Origin, to specify that the program starts at 100h (COM file format)
+; Display message "Enter a lowercase letter: "
+MOV DX, OFFSET msg_input  ; Load the address of the message
+MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+INT 21h            ; Call DOS interrupt to print the message
+; Read a single character from the user
+MOV AH, 01h        ; Function 01h of INT 21h is used to read a character
+INT 21h            ; Call DOS interrupt to get the character
+MOV DL, AL         ; Store the input character in AL
+; Check if the character is a lowercase letter (a-z)
+CMP AL, 'a'        ; Compare AL with 'a'
+JL NotLowerCase    ; If the input is less than 'a', it is not lowercase
+CMP AL, 'z'        ; Compare AL with 'z'
+JG NotLowerCase    ; If the input is greater than 'z', it is not lowercase
+; Convert the lowercase letter to uppercase
+SUB AL, 20h        ; Subtract 32 (20h) to convert lowercase to uppercase
+MOV BL,AL
+; Print the message "The uppercase letter is: "
+MOV DX, OFFSET msg_output  ; Load the address of the output message
+MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+INT 21h            ; Call DOS interrupt to print the output message
+MOV AL, BL
+; Print the converted uppercase letter
+MOV DL, AL         ; Move the uppercase letter to DL
+MOV AH, 02h        ; Function 02h of INT 21h is used to print a single character
+INT 21h            ; Call DOS interrupt to print the character
+JMP EndProgram     ; Jump to the end of the program
+NotLowerCase:
+; If the input is not a lowercase letter, display an error message
+MOV DX, OFFSET msg_error  ; Load the address of the error message
+MOV AH, 09h        ; Function 09h of INT 21h is used to display a string
+INT 21h            ; Call DOS interrupt to print the error message
+EndProgram:
+; Terminate the program
+MOV AH, 4Ch        ; Function 4Ch of INT 21h terminates the program
+INT 21h            ; Call DOS interrupt to exit
+msg_input  DB 'Enter a lowercase letter: $'
+msg_output DB 0Dh, 0Ah, 'The uppercase letter is: $'  ; Output message
+msg_error  DB 0Dh, 0Ah, 'Error: Not a lowercase letter! $'  ; Error message
+END                ; End of programprogram
